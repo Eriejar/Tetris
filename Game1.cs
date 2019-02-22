@@ -1,8 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
-using System;
+
 
 namespace Tetris
 {
@@ -14,7 +17,7 @@ namespace Tetris
         GraphicsDeviceManager graphics;
 
 
-        GraphLine graphLine;
+        TetrisGameEngine engine;
 
         VertexPositionTexture[] floorVerts;
         BasicEffect effect;
@@ -23,11 +26,12 @@ namespace Tetris
 
         Vector3 cameraPosition = new Vector3(0, 120, 10);
 
+        double secondTimer = 0;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            
         }
 
         /// <summary>
@@ -49,15 +53,9 @@ namespace Tetris
 
             effect = new BasicEffect(graphics.GraphicsDevice);
 
-            var model = Content.Load<Model>("Red_block");
-            var graphSlot = new GraphSlot(new Vector3(0,0,4));
-            graphLine = new GraphLine(3);
-            graphLine.Initialize(new Vector3(0, 0, 4), new Vector3(4, 0, 0));
-            graphLine.InsertBlock(new Block(), model, 2);
-            graphLine.InsertBlock(new Block(), model, 1);
-            graphLine.InsertBlock(new Block(), model, 3);
-            graphLine.DeleteBlocks();
-
+            var gen = new TetrisGenerator(Content);
+            engine = new TetrisGameEngine();
+            engine.Initialize(gen);
 
             camera = new Camera(graphics.GraphicsDevice);
 
@@ -90,7 +88,20 @@ namespace Tetris
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            secondTimer += gameTime.ElapsedGameTime.TotalSeconds;
+            if (secondTimer >= 1)
+            {
+                secondTimer -= 1;
+                SecondTimerEvents();
+            }
+
+
             base.Update(gameTime);
+        }
+
+        private void SecondTimerEvents()
+        {
+            engine.SecondEvents();
         }
 
         /// <summary>
@@ -101,9 +112,9 @@ namespace Tetris
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            DrawGround();
+            // DrawGround();
             
-            graphLine.Draw(camera);
+            engine.graph.Draw(camera);
 
             base.Draw(gameTime);
         }
