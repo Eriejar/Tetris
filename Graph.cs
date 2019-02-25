@@ -42,7 +42,23 @@ namespace Tetris
             }
         }
 
-
+        public string GetDebugGraph(Type displayType)
+        {
+            var debugGraph = new List<string>();
+            for (int row = height; row > 0; row--)
+            {
+                var slotsOnLine = new List<string>();
+                for (int column = 1; column <= width; column++)
+                {
+                    string item = " ";
+                    if (displayType == typeof(Block)) { item = GetSlot(row, column).HasBlock() ? "B" : "0"; }
+                    if (displayType == typeof(Faller)) { item = GetSlot(row, column).HasFallerBlock() ? "F" : "0"; }
+                    slotsOnLine.Add(String.Format("[{0}]", item));
+                }
+                debugGraph.Add(String.Join(" ", slotsOnLine));
+            }
+            return String.Join("\n", debugGraph);
+        }
 
         public void InsertBlock(Block block, int row, int column)
         {

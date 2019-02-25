@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,33 +11,33 @@ namespace Tetris {
     public class Faller {
         // l faller implementation
         public enum States { Up, Right, Down, Left };
+        public bool Landed = false;
+        public bool Frozen = false;
 
         List<GraphSlot> slots;
         Graph graph;
         States state;
         List<Block> tempBlocks = new List<Block>();
-        public bool Landed = false;
-        public bool Frozen = false;
 
-        private int[,] rightDestMatrix = new int[,] {   { 0, 0, 1, 0 },                                                       
-                                                        { 0, 0, 1, 0 },
-                                                        { 0, 0, 1, 0 },
-                                                        { 0, 0, 1, 0 } };
+        int[,] rightDestMatrix = new int[,] {   { 0, 0, 1, 0 },                                                       
+                                                { 0, 0, 1, 0 },
+                                                { 0, 0, 1, 0 },
+                                                { 0, 0, 1, 0 } };
 
-        private int[,] downDestMatrix = new int[,] {    { 0, 0, 0, 0 },
-                                                        { 0, 0, 0, 0 },
-                                                        { 1, 1, 1, 1 },
-                                                        { 0, 0, 0, 0 } };
+        int[,] downDestMatrix = new int[,] {    { 0, 0, 0, 0 },
+                                                { 0, 0, 0, 0 },
+                                                { 1, 1, 1, 1 },
+                                                { 0, 0, 0, 0 } };
 
-        private int[,] leftDestMatrix = new int[,] {    { 0, 1, 0, 0 },
-                                                        { 0, 1, 0, 0 },
-                                                        { 0, 1, 0, 0 },
-                                                        { 0, 1, 0, 0 } };
+        int[,] leftDestMatrix = new int[,] {    { 0, 1, 0, 0 },
+                                                { 0, 1, 0, 0 },
+                                                { 0, 1, 0, 0 },
+                                                { 0, 1, 0, 0 } };
 
-        private int[,] upDestMatrix = new int[,] {      { 0, 0, 0, 0 },
-                                                        { 1, 1, 1, 1 },
-                                                        { 0, 0, 0, 0 },
-                                                        { 0, 0, 0, 0 } };
+        int[,] upDestMatrix = new int[,] {  { 0, 0, 0, 0 },
+                                            { 1, 1, 1, 1 },
+                                            { 0, 0, 0, 0 },
+                                            { 0, 0, 0, 0 } };
 
         public Faller(ref List<GraphSlot> slots, States state, ref Graph graph)
         {
@@ -60,24 +61,29 @@ namespace Tetris {
             slots = destSlots;
         }
 
-        public void Rotate()
-        { 
+        public bool Rotate()
+        {
+            bool rotated = false;
+            var topLeftMatrixCoordinate = GetMatrixBoxCoordinate();
+            
             if (state == States.Up)
             {
-                Rotate(rightDestMatrix, slots[0].row + 1, slots[0].column, States.Right);
+                rotated = Rotate(rightDestMatrix, topLeftMatrixCoordinate, States.Right);
             }
             else if (state == States.Right)
             {
-                Rotate(downDestMatrix, slots[0].row, slots[0].column - 2, States.Down);
+                rotated = Rotate(downDestMatrix, topLeftMatrixCoordinate, States.Down);
             }
             else if (state == States.Down)
             {
-                Rotate(leftDestMatrix, slots[0].row + 2, slots[0].column, States.Left);
+                rotated = Rotate(leftDestMatrix, topLeftMatrixCoordinate, States.Left);
             }
             else if (state == States.Left)
             {
-                Rotate(upDestMatrix, slots[0].row, slots[0].column - 1, States.Up);
+                rotated = Rotate(upDestMatrix, topLeftMatrixCoordinate, States.Up);
             }
+
+            return rotated;
             
         }
 
@@ -106,9 +112,11 @@ namespace Tetris {
             return false;
         }
 
-        private bool Rotate(int[,] destMatrix, int topLeftCornerRow, int topLeftCornerColumn, States endState)
+        private bool Rotate(int[,] destMatrix, Tuple<int,int> matrixTopLeftCoordinate , States endState)
         {
-            List<GraphSlot> destSlots = GetDestSlots(rightDestMatrix, topLeftCornerRow, topLeftCornerColumn);
+            List<GraphSlot> destSlots = GetDestSlots(destMatrix, matrixTopLeftCoordinate);
+            if (destSlots == null) { return false; }
+
             if (AllSlotsOpen(ref destSlots))
             {
                 Map(ref slots, ref destSlots);
@@ -121,7 +129,7 @@ namespace Tetris {
 
        
 
-        private List<GraphSlot> GetDestSlots(int[,] destMatrix, int rowTopLeft, int columnTopLeft)
+        private List<GraphSlot> GetDestSlots(int[,] destMatrix, Tuple<int,int> matrixTopLeftCoordinate)
         {
             var destSlots = new List<GraphSlot>();
             for (int i = 0; i < 4; i++)
@@ -132,9 +140,9 @@ namespace Tetris {
                     {
                         try
                         {
-                            destSlots.Add(graph.GetSlot(rowTopLeft - i, columnTopLeft + j));
+                            destSlots.Add(graph.GetSlot(matrixTopLeftCoordinate.Item1 - i, matrixTopLeftCoordinate.Item2 + j));
                         }
-                        catch (ArgumentOutOfRangeException)
+                        catch (ArgumentOutOfRangeException) // Handles out of graph scenarios
                         {
                             return null;
                         }
@@ -158,7 +166,7 @@ namespace Tetris {
 
         private void Map(ref List<GraphSlot> orig, ref List<GraphSlot> dest)
         {
-            // Maps blocks from orig to dest, emptying orig blocks. (DOES NOT AFFECT instances slots)
+            // Maps blocks from orig to dest, emptying orig blocks. (DOES NOT AFFECT graph instance slots)
 
             if (orig.Count != dest.Count) { throw new ArgumentException("orig and dest are not the same size"); }
 
@@ -175,7 +183,35 @@ namespace Tetris {
             tempBlocks.Clear();
         }
 
+        private Tuple<int, int> GetMatrixBoxCoordinate()
+        {
+            int? row = null;
+            int? col = null;
+            var topLeftSlot = slots.OrderByDescending(x => x.row).ThenBy(x => x.column).First();
+            if (state == States.Up)
+            {
+                row = topLeftSlot.row + 1;
+                col = topLeftSlot.column;
+            }
+            else if (state == States.Right)
+            {
+                row = topLeftSlot.row;
+                col = topLeftSlot.column - 2;
+            }
+            else if (state == States.Down)
+            {
+                row = topLeftSlot.row + 2;
+                col = topLeftSlot.column;
+            }
+            else if (state == States.Left)
+            {
+                row = topLeftSlot.row;
+                col = topLeftSlot.column - 1;
+            }
 
+            var coordinate = new Tuple<int, int>((int)row, (int)col);
+            return coordinate;            
+        }
 
 
     }

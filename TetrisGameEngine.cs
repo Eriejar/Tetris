@@ -22,7 +22,6 @@ namespace Tetris
             graph = new Graph();
             graph.Initialize(new Vector3(0, 0, -16), 4);
 
-            SampleBlocks();
             faller = SampleFaller();
         }
 
@@ -30,6 +29,7 @@ namespace Tetris
         {
             graph.Gravitize();
             FallerAction();
+            faller.Rotate();
         }
 
         private void SampleBlocks()
