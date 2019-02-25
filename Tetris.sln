@@ -1,25 +1,39 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tetris", "Tetris.csproj", "{F1F8B334-9448-4456-B25B-F064CBC6E184}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tetris", "Tetris\Tetris.csproj", "{F1F8B334-9448-4456-B25B-F064CBC6E184}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetrisTests", "TetrisTests\TetrisTests.csproj", "{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1F8B334-9448-4456-B25B-F064CBC6E184}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{F1F8B334-9448-4456-B25B-F064CBC6E184}.Debug|x86.ActiveCfg = Debug|x86
 		{F1F8B334-9448-4456-B25B-F064CBC6E184}.Debug|x86.Build.0 = Debug|x86
+		{F1F8B334-9448-4456-B25B-F064CBC6E184}.Release|Any CPU.ActiveCfg = Release|x86
 		{F1F8B334-9448-4456-B25B-F064CBC6E184}.Release|x86.ActiveCfg = Release|x86
 		{F1F8B334-9448-4456-B25B-F064CBC6E184}.Release|x86.Build.0 = Release|x86
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Debug|x86.Build.0 = Debug|Any CPU
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Release|x86.ActiveCfg = Release|Any CPU
+		{CDDDAD12-B5A9-44F3-BF9C-AEC511700EAB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {80D189A0-CB00-40A6-B3A6-FB340EF9B4F5}
+		SolutionGuid = {64DE193F-C042-48A5-BCDA-4F65BB7D3F4C}
 	EndGlobalSection
 EndGlobal
